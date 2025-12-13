@@ -2,8 +2,9 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const canvasWidth = 1080;
+const canvasWidth = 1200;
 const canvasHeight = canvasWidth / 16 * 9;
+
 const centerWidth = canvasWidth / 2;
 const centerHeight = canvasHeight / 2
 
@@ -54,26 +55,40 @@ class Vertex {
     }
 }
 
-const cube = [];
+const vertices = [];
+const faces = [];
+
 const c = new Vertex(centerWidth, centerHeight, 0);
 
-cube[0] = new Vertex(400, 200, -100);
-cube[1] = new Vertex(600, 200, -100);
-cube[2] = new Vertex(400, 400, -100);
-cube[3] = new Vertex(600, 400, -100);
-cube[4] = new Vertex(400, 200,  100);
-cube[5] = new Vertex(600, 200,  100);
-cube[6] = new Vertex(400, 400,  100);
-cube[7] = new Vertex(600, 400,  100);
+const r = 300;
+const dv = 10;
+const dh = dv + 1;
 
-const cubeFaces = [
-    [0, 1, 2], [1, 3, 2],
-    [5, 4, 7], [4, 6, 7],
-    [4, 0, 6], [0, 2, 6],
-    [1, 5, 3], [5, 7, 3],
-    [4, 5, 0], [5, 1, 0],
-    [2, 3, 6], [3, 7, 6]
-]
+for (var i = 0; i <= dv; i++) {
+    const a = i * Math.PI / dv;
+
+    for (var j = 0; j <= dv; j++) {
+        const b = j * Math.PI / dv;
+
+        
+        const x = r * Math.sin(a) * Math.cos(b);
+        const y = r * Math.sin(a) * Math.sin(b);
+        const z = r * Math.cos(a);
+
+        vertices.push(new Vertex(x, y, z));
+    }
+}
+
+for (var i = 0; i < dv; i++) {
+    for (var j = 0; j < dv; j++) {
+        const a = i * dh + j;
+        const b = a + 1;
+        const c = a + dh;
+        const d = c + 1;
+
+        faces.push([a, b, c]);
+    }
+}
 
 function drawVertex(x, y) {
     ctx.beginPath();
@@ -112,17 +127,18 @@ function loop() {
 
     const projected = [];
 
-    for (var v of cube) {
-        var centralized = new Vertex(v.x - c.x, v.y - c.y, v.z - c.z)
-        var rotated = mvMul(xMat(angle), centralized);
+    for (var v of vertices) {
+        let rotated = mvMul(xMat(angle), v);
         rotated = mvMul(yMat(angle), rotated);
-        var decentralized = new Vertex(rotated.x + c.x, rotated.y + c.y, rotated.z + c.z)
-        var projection = mvMul(projectionMat, decentralized);
-        
-        projected.push(projection);
+
+        projected.push({
+            x: rotated.x + centerWidth,
+            y: rotated.y + centerHeight,
+            z: rotated.z
+        });
     }
 
-    for (var face of cubeFaces) {
+    for (var face of faces) {
         const v1 = projected[face[0]];
         const v2 = projected[face[1]];
         const v3 = projected[face[2]];
