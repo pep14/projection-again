@@ -61,7 +61,7 @@ const faces = [];
 const c = new Vertex(centerWidth, centerHeight, 0);
 
 const r = 300;
-const dv = 10;
+const dv = 50;
 const dh = dv + 1;
 
 for (var i = 0; i <= dv; i++) {
