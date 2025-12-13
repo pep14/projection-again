@@ -90,7 +90,7 @@ function drawVertex(x, y) {
 function drawEdge(u, v) {
     ctx.beginPath();
     ctx.moveTo(u.x, u.y);
-    ctx.moveTo(v.x, v.y);
+    ctx.lineTo(v.x, v.y);
     ctx.strokeStyle = "white";
     ctx.stroke();
 }
@@ -110,6 +110,8 @@ function loop() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+    const projected = [];
+
     for (var v of cube) {
         var centralized = new Vertex(v.x - c.x, v.y - c.y, v.z - c.z)
         var rotated = mvMul(xMat(angle), centralized);
@@ -117,7 +119,17 @@ function loop() {
         var decentralized = new Vertex(rotated.x + c.x, rotated.y + c.y, rotated.z + c.z)
         var projection = mvMul(projectionMat, decentralized);
         
-        drawVertex(projection.x, projection.y);
+        projected.push(projection);
+    }
+
+    for (var face of cubeFaces) {
+        const v1 = projected[face[0]];
+        const v2 = projected[face[1]];
+        const v3 = projected[face[2]];
+
+        drawEdge(v1, v2);
+        drawEdge(v2, v3);
+        drawEdge(v1, v3);
     }
 
     requestAnimationFrame(loop)
