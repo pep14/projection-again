@@ -121,10 +121,10 @@ class Sphere {
 const sphere = new Sphere(100, 100, 100, 200, 20);
 const cube = new Cuboid(
     new Vertex(-100, -100, -100),
-    new Vertex(100, 100, 100)
+    new Vertex(0, 0, 0)
 )
 
-const shapes = [cube]
+const shapes = [cube, sphere]
 
 function drawVertex(x, y) {
     ctx.beginPath();
