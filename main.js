@@ -55,40 +55,76 @@ class Vertex {
     }
 }
 
-const vertices = [];
-const faces = [];
+class Cuboid {
+    constructor(u, v) {
+        this.vertices = [
+            new Vertex(u.x, u.y, u.z),
+            new Vertex(v.x, u.y, u.z),
+            new Vertex(u.x, v.y, u.z),
+            new Vertex(v.x, v.y, u.z),
+            new Vertex(u.x, u.y, v.z),
+            new Vertex(v.x, u.y, v.z),
+            new Vertex(u.x, v.y, v.z),
+            new Vertex(v.x, v.y, v.z),
+        ]
 
-const c = new Vertex(centerWidth, centerHeight, 0);
-
-const r = 300;
-const dv = 30;
-const dh = dv + 1;
-
-for (var i = 0; i <= dv; i++) {
-    const a = i * Math.PI / dv;
-
-    for (var j = 0; j <= dv; j++) {
-        const b = 2 * j * Math.PI / dv;
-
-        
-        const x = r * Math.sin(a) * Math.cos(b);
-        const y = r * Math.sin(a) * Math.sin(b);
-        const z = r * Math.cos(a);
-
-        vertices.push(new Vertex(x, y, z));
+        this.faces = [
+            [0, 1, 2], [1, 3, 2],
+            [5, 4, 7], [4, 6, 7],
+            [4, 0, 6], [0, 2, 6],
+            [1, 5, 3], [5, 7, 3],
+            [4, 5, 0], [5, 1, 0],
+            [2, 3, 6], [3, 7, 6],
+        ]
     }
 }
 
-for (var i = 0; i < dv; i++) {
-    for (var j = 0; j < dv; j++) {
-        const a = i * dh + j;
-        const b = a + 1;
-        const c = a + dh;
-        const d = c + 1;
+class Sphere {
+    constructor(sx, sy, sz, r, detail) {
+        const vertices = [];
+        const faces = [];
 
-        faces.push([a, b, c]);
+        const dv = detail;
+        const dh = dv + 1;
+
+        for (var i = 0; i <= dv; i++) {
+            const a = i * Math.PI / dv;
+
+            for (var j = 0; j <= dv; j++) {
+                const b = 2 * j * Math.PI / dv;
+
+                
+                const x = r * Math.sin(a) * Math.cos(b);
+                const y = r * Math.sin(a) * Math.sin(b);
+                const z = r * Math.cos(a);
+
+                vertices.push(new Vertex(x + sx, y + sy, z + sz));
+            }
+        }
+
+        for (var i = 0; i < dv; i++) {
+            for (var j = 0; j < dv; j++) {
+                const a = i * dh + j;
+                const b = a + 1;
+                const c = a + dh;
+                const d = c + 1;
+
+                faces.push([a, b, c]);
+            }
+        }
+
+        this.vertices = vertices;
+        this.faces = faces;
     }
 }
+
+const sphere = new Sphere(100, 100, 100, 200, 20);
+const cube = new Cuboid(
+    new Vertex(-100, -100, -100),
+    new Vertex(100, 100, 100)
+)
+
+const shapes = [cube]
 
 function drawVertex(x, y) {
     ctx.beginPath();
@@ -125,27 +161,32 @@ function loop() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    const projected = [];
+    for (var shape of shapes) {
+        const vertices = shape.vertices;
+        const faces = shape.faces;
 
-    for (var v of vertices) {
-        let rotated = mvMul(xMat(angle), v);
-        rotated = mvMul(yMat(angle), rotated);
+        const projected = [];
 
-        projected.push(new Vertex(
-            rotated.x + centerWidth,
-            rotated.y + centerHeight,
-            rotated.z
-        ));
-    }
+        for (var v of vertices) {
+            let rotated = mvMul(xMat(angle), v);
+            rotated = mvMul(yMat(angle), rotated);
 
-    for (var face of faces) {
-        const v1 = projected[face[0]];
-        const v2 = projected[face[1]];
-        const v3 = projected[face[2]];
+            projected.push(new Vertex(
+                rotated.x + centerWidth,
+                rotated.y + centerHeight,
+                rotated.z
+            ));
+        }
 
-        drawEdge(v1, v2);
-        drawEdge(v2, v3);
-        drawEdge(v1, v3);
+        for (var face of faces) {
+            const v0 = projected[face[0]];
+            const v1 = projected[face[1]];
+            const v2 = projected[face[2]];
+
+            drawEdge(v0, v1);
+            drawEdge(v1, v2);
+            drawEdge(v2, v0);
+        }
     }
 
     requestAnimationFrame(loop)
