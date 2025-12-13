@@ -68,7 +68,7 @@ for (var i = 0; i <= dv; i++) {
     const a = i * Math.PI / dv;
 
     for (var j = 0; j <= dv; j++) {
-        const b = j * Math.PI / dv;
+        const b = 2 * j * Math.PI / dv;
 
         
         const x = r * Math.sin(a) * Math.cos(b);
@@ -131,11 +131,11 @@ function loop() {
         let rotated = mvMul(xMat(angle), v);
         rotated = mvMul(yMat(angle), rotated);
 
-        projected.push({
-            x: rotated.x + centerWidth,
-            y: rotated.y + centerHeight,
-            z: rotated.z
-        });
+        projected.push(new Vertex(
+            rotated.x + centerWidth,
+            rotated.y + centerHeight,
+            rotated.z
+        ));
     }
 
     for (var face of faces) {
