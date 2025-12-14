@@ -8,7 +8,14 @@ const canvasHeight = canvasWidth / 16 * 9;
 const centerWidth = canvasWidth / 2;
 const centerHeight = canvasHeight / 2
 
-var angle = 0;
+const keys = {
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+    e: false,
+    q: false,
+}
 
 const projectionMat = [
     [1, 0, 0],
@@ -51,7 +58,7 @@ function mvMul(m, v) {
 function projectFromPerspective(v, fov, distance) {
     const z = distance + v.z;
 
-    if (z < 0) return;
+    if (z <= 0.01) return null;
 
     const scale = fov / z;
 
@@ -184,11 +191,16 @@ function drawEdge(u, v) {
 }
 
 function loop() {
-    angle += 0.02;
-
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    if (keys.w) camera.z += 2.5;
+    if (keys.a) camera.x -= 2.5;
+    if (keys.s) camera.z -= 2.5;
+    if (keys.d) camera.x += 2.5;
+    if (keys.e) camera.y -= 2.5;
+    if (keys.q) camera.y += 2.5;
 
     for (var shape of shapes) {
         const vertices = shape.vertices;
@@ -197,12 +209,21 @@ function loop() {
         const projected = [];
 
         for (var v of vertices) {
-            var rotated = mvMul(yMat(camera.ry), v);
-            rotated = mvMul(xMat(camera.rx), rotated);
+            var cv = new Vertex(
+                v.x - camera.x,
+                v.y - camera.y,
+                v.z - camera.z,
+            )
 
-            var p = projectFromPerspective(rotated, camera.fov, camera.distance)
+            cv = mvMul(yMat(camera.ry), cv);
+            cv = mvMul(xMat(camera.rx), cv);
 
-            if (!p) continue;
+            var p = projectFromPerspective(cv, camera.fov, camera.distance)
+
+            if (!p) {
+                projected.push(null);
+                continue;
+            };
 
             p.x -= camera.x;
             p.y -= camera.y;
@@ -219,6 +240,8 @@ function loop() {
             const v0 = projected[face[0]];
             const v1 = projected[face[1]];
             const v2 = projected[face[2]];
+
+            if (!v0 || !v1 || !v2) continue;
 
             drawEdge(v0, v1);
             drawEdge(v1, v2);
