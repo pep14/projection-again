@@ -40,6 +40,28 @@ const zMat = (angle) => {
     ]
 }
 
+function mvMul(m, v) {
+    return {
+        x: m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+        y: m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+        z: m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
+    }
+}
+
+function projectFromPerspective(v, fov, distance) {
+    const z = distance + v.z;
+
+    if (z < 0) return;
+
+    const scale = fov / z;
+
+    return {
+        x: v.x * scale,
+        y: v.y * scale,
+        z: v.z * scale
+    }
+}
+
 canvas.setAttribute("width", canvasWidth);
 canvas.setAttribute("height", canvasHeight);
 
@@ -52,6 +74,21 @@ class Vertex {
 
     draw() {
         drawVertex(this.x, this.y)
+    }
+}
+
+class Cuck {
+    constructor(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        this.distance = 1000;
+        this.fov = 500;
+
+        this.rx = 0;
+        this.ry = 0;
+        this.rz = 0;
     }
 }
 
@@ -92,7 +129,6 @@ class Sphere {
 
             for (var j = 0; j <= dv; j++) {
                 const b = 2 * j * Math.PI / dv;
-
                 
                 const x = r * Math.sin(a) * Math.cos(b);
                 const y = r * Math.sin(a) * Math.sin(b);
@@ -118,6 +154,7 @@ class Sphere {
     }
 }
 
+const camera = new Cuck(0, 0, 0)
 const sphere = new Sphere(100, 100, 100, 200, 20);
 const cube = new Cuboid(
     new Vertex(-100, -100, -100),
@@ -146,14 +183,6 @@ function drawEdge(u, v) {
     ctx.stroke();
 }
 
-function mvMul(m, v) {
-    return {
-        x: m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
-        y: m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
-        z: m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
-    }
-}
-
 function loop() {
     angle += 0.02;
 
@@ -168,13 +197,21 @@ function loop() {
         const projected = [];
 
         for (var v of vertices) {
-            let rotated = mvMul(xMat(angle), v);
-            rotated = mvMul(yMat(angle), rotated);
+            var rotated = mvMul(yMat(camera.ry), v);
+            rotated = mvMul(xMat(camera.rx), rotated);
+
+            var p = projectFromPerspective(rotated, camera.fov, camera.distance)
+
+            if (!p) continue;
+
+            p.x -= camera.x;
+            p.y -= camera.y;
+            p.z -= camera.z;
 
             projected.push(new Vertex(
-                rotated.x + centerWidth,
-                rotated.y + centerHeight,
-                rotated.z
+                p.x + centerWidth,
+                p.y + centerHeight,
+                p.z
             ));
         }
 
