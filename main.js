@@ -8,6 +8,12 @@ const canvasHeight = canvasWidth / 16 * 9;
 const centerWidth = canvasWidth / 2;
 const centerHeight = canvasHeight / 2
 
+const speed = 2.5;
+const rotationspeed = 0.01;
+const fov = 500;
+
+var lastmousepos = {x: 0, y: 0};
+
 const keys = {
     w: false,
     a: false,
@@ -15,6 +21,10 @@ const keys = {
     d: false,
     e: false,
     q: false,
+    ArrowLeft: false,
+    ArrowRight: false,
+    ArrowUp: false,
+    ArrowDown: false,
 }
 
 const projectionMat = [
@@ -56,11 +66,9 @@ function mvMul(m, v) {
 }
 
 function projectFromPerspective(v, fov, distance) {
-    const z = distance + v.z;
+    if (v.z <= 0.01) return null;
 
-    if (z <= 0.01) return null;
-
-    const scale = fov / z;
+    const scale = fov / v.z;
 
     return {
         x: v.x * scale,
@@ -84,14 +92,13 @@ class Vertex {
     }
 }
 
-class Cuck {
+class Camera {
     constructor(x, y, z) {
         this.x = x;
         this.y = y;
         this.z = z;
 
-        this.distance = 1000;
-        this.fov = 500;
+        this.fov = fov;
 
         this.rx = 0;
         this.ry = 0;
@@ -161,7 +168,7 @@ class Sphere {
     }
 }
 
-const camera = new Cuck(0, 0, 0)
+const camera = new Camera(0, 0, -1000)
 const sphere = new Sphere(100, 100, 100, 200, 20);
 const cube = new Cuboid(
     new Vertex(-100, -100, -100),
@@ -195,12 +202,18 @@ function loop() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    if (keys.w) camera.z += 2.5;
-    if (keys.a) camera.x -= 2.5;
-    if (keys.s) camera.z -= 2.5;
-    if (keys.d) camera.x += 2.5;
-    if (keys.e) camera.y -= 2.5;
-    if (keys.q) camera.y += 2.5;
+    if (keys.w) camera.z += speed;
+    if (keys.a) camera.x -= speed;
+    if (keys.s) camera.z -= speed;
+    if (keys.d) camera.x += speed;
+    if (keys.e) camera.y -= speed;
+    if (keys.q) camera.y += speed;
+    if (keys.ArrowLeft)  camera.ry -= rotationspeed;
+    if (keys.ArrowRight) camera.ry += rotationspeed;
+    if (keys.ArrowUp)    camera.rx -= rotationspeed;
+    if (keys.ArrowDown)  camera.rx += rotationspeed;
+
+    camera.rx = Math.max(-Math.PI / 2 - 0.01, Math.min(Math.PI / 2 - 0.01, camera.rx));
 
     for (var shape of shapes) {
         const vertices = shape.vertices;
@@ -215,8 +228,8 @@ function loop() {
                 v.z - camera.z,
             )
 
-            cv = mvMul(yMat(camera.ry), cv);
-            cv = mvMul(xMat(camera.rx), cv);
+            cv = mvMul(yMat(-camera.ry), cv);
+            cv = mvMul(xMat(-camera.rx), cv);
 
             var p = projectFromPerspective(cv, camera.fov, camera.distance)
 
