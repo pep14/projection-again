@@ -2,7 +2,7 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const canvasWidth = 1200;
+const canvasWidth = window.innerWidth;
 const canvasHeight = canvasWidth / 16 * 9;
 
 const centerWidth = canvasWidth / 2;
@@ -29,10 +29,10 @@ canvas.setAttribute("width", canvasWidth);
 canvas.setAttribute("height", canvasHeight);
 
 const camera = new Camera(0, 0, -1000)
-const sphere = new Sphere(100, 100, 100, 200, 20);
+const sphere = new Sphere({x: 100, y: 100, z: 100}, 200, 20);
 const cube = new Cuboid(
-    new Vertex(-100, -100, -100),
-    new Vertex(0, 0, 0)
+    {x: -200, y: -200, z: -200},
+    {x: 0, y: 0, z: 0}
 )
 
 const shapes = [cube, sphere]
@@ -130,11 +130,11 @@ function loop() {
                 continue;
             };
 
-            projected.push(new Vertex(
-                p.x + centerWidth,
-                p.y + centerHeight,
-                p.z
-            ));
+            projected.push({
+                x: p.x + centerWidth,
+                y: p.y + centerHeight,
+                z: p.z
+            });
         }
 
         for (var face of faces) {

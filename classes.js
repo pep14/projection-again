@@ -1,11 +1,3 @@
-class Vertex {
-    constructor(x, y, z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-}
-
 class Camera {
     constructor(x, y, z) {
         this.x = x;
@@ -23,14 +15,14 @@ class Camera {
 class Cuboid {
     constructor(u, v) {
         this.vertices = [
-            new Vertex(u.x, u.y, u.z),
-            new Vertex(v.x, u.y, u.z),
-            new Vertex(u.x, v.y, u.z),
-            new Vertex(v.x, v.y, u.z),
-            new Vertex(u.x, u.y, v.z),
-            new Vertex(v.x, u.y, v.z),
-            new Vertex(u.x, v.y, v.z),
-            new Vertex(v.x, v.y, v.z),
+            {x: u.x, y: u.y, z: u.z},
+            {x: v.x, y: u.y, z: u.z},
+            {x: u.x, y: v.y, z: u.z},
+            {x: v.x, y: v.y, z: u.z},
+            {x: u.x, y: u.y, z: v.z},
+            {x: v.x, y: u.y, z: v.z},
+            {x: u.x, y: v.y, z: v.z},
+            {x: v.x, y: v.y, z: v.z},
         ]
 
         this.faces = [
@@ -45,7 +37,7 @@ class Cuboid {
 }
 
 class Sphere {
-    constructor(sx, sy, sz, r, detail) {
+    constructor(c, r, detail) {
         const vertices = [];
         const faces = [];
 
@@ -62,7 +54,7 @@ class Sphere {
                 const y = r * Math.sin(a) * Math.sin(b);
                 const z = r * Math.cos(a);
 
-                vertices.push(new Vertex(x + sx, y + sy, z + sz));
+                vertices.push({x: x + c.x, y: y + c.y, z: z + c.z});
             }
         }
 
@@ -71,7 +63,6 @@ class Sphere {
                 const a = i * dh + j;
                 const b = a + 1;
                 const c = a + dh;
-                const d = c + 1;
 
                 faces.push([a, b, c]);
             }
