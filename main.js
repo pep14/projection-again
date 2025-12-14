@@ -1,33 +1,3 @@
-/** @type {HTMLCanvasElement} */
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-const canvasWidth = window.innerWidth;
-const canvasHeight = canvasWidth / 16 * 9;
-
-const centerWidth = canvasWidth / 2;
-const centerHeight = canvasHeight / 2
-
-const speed = 2.5;
-const rotationspeed = 0.01;
-const fov = 500;
-
-const keys = {
-    w: false,
-    a: false,
-    s: false,
-    d: false,
-    e: false,
-    q: false,
-    ArrowLeft: false,
-    ArrowRight: false,
-    ArrowUp: false,
-    ArrowDown: false,
-}
-
-canvas.setAttribute("width", canvasWidth);
-canvas.setAttribute("height", canvasHeight);
-
 const camera = new Camera(0, 0, -1000)
 const sphere = new Sphere({x: 100, y: 100, z: 100}, 200, 20);
 const cube = new Cuboid(
@@ -36,26 +6,6 @@ const cube = new Cuboid(
 )
 
 const shapes = [cube, sphere]
-
-function drawVertex(x, y) {
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, 2 * Math.PI);
-    ctx.fillStyle = "white";
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = "black";
-    ctx.fill();
-}
-
-function drawEdge(u, v) {
-    ctx.beginPath();
-    ctx.moveTo(u.x, u.y);
-    ctx.lineTo(v.x, v.y);
-    ctx.strokeStyle = "white";
-    ctx.stroke();
-}
 
 function loop() {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -101,19 +51,19 @@ function loop() {
 
     if (keys.ArrowLeft)  camera.ry -= rotationspeed;
     if (keys.ArrowRight) camera.ry += rotationspeed;
-    if (keys.ArrowUp)    camera.rx -= rotationspeed;
-    if (keys.ArrowDown)  camera.rx += rotationspeed;
+    if (keys.ArrowUp)    camera.rx += rotationspeed;
+    if (keys.ArrowDown)  camera.rx -= rotationspeed;
 
     const clamp = Math.PI / 2 - 0.01
     camera.rx = Math.max(-clamp, Math.min(clamp, camera.rx));
 
-    for (var shape of shapes) {
+    for (const shape of shapes) {
         const vertices = shape.vertices;
         const faces = shape.faces;
 
         const projected = [];
 
-        for (var v of vertices) {
+        for (const v of vertices) {
             var cv = {
                 x: v.x - camera.x,
                 y: v.y - camera.y,
@@ -137,16 +87,17 @@ function loop() {
             });
         }
 
-        for (var face of faces) {
+        for (const face of faces) {
             const v0 = projected[face[0]];
             const v1 = projected[face[1]];
             const v2 = projected[face[2]];
 
             if (!v0 || !v1 || !v2) continue;
 
-            drawEdge(v0, v1);
-            drawEdge(v1, v2);
-            drawEdge(v2, v0);
+            drawFace([v0, v1, v2], "gray")
+            drawEdge(v0, v1, "white");
+            drawEdge(v1, v2, "white");
+            drawEdge(v2, v0, "white");
         }
     }
 

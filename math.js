@@ -36,7 +36,7 @@ function mvMul(m, v) {
     }
 }
 
-function projectFromPerspective(v, fov, distance) {
+function projectFromPerspective(v, fov) {
     if (v.z <= 0.01) return null;
 
     const scale = fov / v.z;

@@ -63,8 +63,10 @@ class Sphere {
                 const a = i * dh + j;
                 const b = a + 1;
                 const c = a + dh;
+                const d = c + 1
 
                 faces.push([a, b, c]);
+                faces.push([b, c, d]);
             }
         }
 
