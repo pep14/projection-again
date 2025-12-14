@@ -12,8 +12,6 @@ const speed = 2.5;
 const rotationspeed = 0.01;
 const fov = 500;
 
-var lastmousepos = {x: 0, y: 0};
-
 const keys = {
     w: false,
     a: false,
@@ -64,9 +62,6 @@ function loop() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    const csin = Math.sin(camera.ry);
-    const ccos = Math.cos(camera.ry);
-
     const vertical = {
         x:  Math.sin(camera.ry) * Math.cos(camera.rx),
         y: -Math.sin(camera.rx),
@@ -109,7 +104,8 @@ function loop() {
     if (keys.ArrowUp)    camera.rx -= rotationspeed;
     if (keys.ArrowDown)  camera.rx += rotationspeed;
 
-    camera.rx = Math.max(-Math.PI / 2 - 0.01, Math.min(Math.PI / 2 - 0.01, camera.rx));
+    const clamp = Math.PI / 2 - 0.01
+    camera.rx = Math.max(-clamp, Math.min(clamp, camera.rx));
 
     for (var shape of shapes) {
         const vertices = shape.vertices;
@@ -118,16 +114,16 @@ function loop() {
         const projected = [];
 
         for (var v of vertices) {
-            var cv = new Vertex(
-                v.x - camera.x,
-                v.y - camera.y,
-                v.z - camera.z,
-            )
+            var cv = {
+                x: v.x - camera.x,
+                y: v.y - camera.y,
+                z: v.z - camera.z,
+            };
 
             cv = mvMul(yMat(-camera.ry), cv);
             cv = mvMul(xMat(-camera.rx), cv);
 
-            var p = projectFromPerspective(cv, camera.fov, camera.distance)
+            var p = projectFromPerspective(cv, camera.fov)
 
             if (!p) {
                 projected.push(null);

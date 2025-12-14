@@ -4,10 +4,6 @@ class Vertex {
         this.y = y;
         this.z = z;
     }
-
-    draw() {
-        drawVertex(this.x, this.y)
-    }
 }
 
 class Camera {
