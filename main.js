@@ -202,12 +202,46 @@ function loop() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    if (keys.w) camera.z += speed;
-    if (keys.a) camera.x -= speed;
-    if (keys.s) camera.z -= speed;
-    if (keys.d) camera.x += speed;
+    const csin = Math.sin(camera.ry);
+    const ccos = Math.cos(camera.ry);
+
+    const vertical = {
+        x:  Math.sin(camera.ry) * Math.cos(camera.rx),
+        y: -Math.sin(camera.rx),
+        z:  Math.cos(camera.ry) * Math.cos(camera.rx),
+    };
+
+    const horizontal = {
+        x:  Math.cos(camera.ry),
+        y:  0,
+        z: -Math.sin(camera.ry),
+    };
+
+    if (keys.w) {
+        camera.x += vertical.x * speed;
+        camera.y += vertical.y * speed;
+        camera.z += vertical.z * speed;
+    }
+
+    if (keys.s) {
+        camera.x -= vertical.x * speed;
+        camera.y -= vertical.y * speed;
+        camera.z -= vertical.z * speed;
+    }
+
+    if (keys.d) {
+        camera.x += horizontal.x * speed;
+        camera.z += horizontal.z * speed;
+    }
+
+    if (keys.a) {
+        camera.x -= horizontal.x * speed;
+        camera.z -= horizontal.z * speed;
+    }
+
     if (keys.e) camera.y -= speed;
     if (keys.q) camera.y += speed;
+
     if (keys.ArrowLeft)  camera.ry -= rotationspeed;
     if (keys.ArrowRight) camera.ry += rotationspeed;
     if (keys.ArrowUp)    camera.rx -= rotationspeed;
@@ -237,10 +271,6 @@ function loop() {
                 projected.push(null);
                 continue;
             };
-
-            p.x -= camera.x;
-            p.y -= camera.y;
-            p.z -= camera.z;
 
             projected.push(new Vertex(
                 p.x + centerWidth,
