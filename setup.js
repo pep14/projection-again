@@ -3,7 +3,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const canvasWidth = window.innerWidth;
-const canvasHeight = canvasWidth / 16 * 9;
+const canvasHeight = window.innerHeight;
 
 const centerWidth = canvasWidth / 2;
 const centerHeight = canvasHeight / 2

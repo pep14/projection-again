@@ -66,7 +66,7 @@ class Sphere {
                 const d = c + 1
 
                 faces.push([a, b, c]);
-                faces.push([b, c, d]);
+                faces.push([c, b, d]);
             }
         }
 

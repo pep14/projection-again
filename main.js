@@ -1,5 +1,5 @@
 const camera = new Camera(0, 0, -1000)
-const sphere = new Sphere({x: 100, y: 100, z: 100}, 200, 20);
+const sphere = new Sphere({x: 100, y: 100, z: 100}, 200, 10);
 const cube = new Cuboid(
     {x: -200, y: -200, z: -200},
     {x: 0, y: 0, z: 0}
@@ -95,6 +95,7 @@ function loop() {
             const v2 = projected[face[2]];
 
             if (!v0 || !v1 || !v2) continue;
+            if (!isFacing(v0, v1, v2)) continue;
 
             globalFaces.push([v0, v1, v2])
         }

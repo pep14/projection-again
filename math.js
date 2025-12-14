@@ -48,6 +48,32 @@ function projectFromPerspective(v, fov) {
     }
 }
 
+function cross(a, b) {
+    return {
+        x: a.y * b.z - a.z * b.y,
+        y: a.x * b.z - a.z * b.x,
+        z: a.x * b.y - a.y * b.x,
+    }
+}
+
+function isFacing(v0, v1, v2) {
+    const a = {
+        x: v1.x - v0.x,
+        y: v1.y - v0.y,
+        z: 0
+    }
+
+    const b = {
+        x: v2.x - v0.x,
+        y: v2.y - v0.y,
+        z: 0
+    }
+
+    const c = cross(a, b)
+
+    return c.z >= 0;
+}
+
 function zIndex(face) {
     return Math.max(face[0].z, face[1].z, face[2].z);
 }
