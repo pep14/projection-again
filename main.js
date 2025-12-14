@@ -1,11 +1,10 @@
 const camera = new Camera(0, 0, -1000)
-const sphere = new Sphere({x: 100, y: 100, z: 100}, 200, 15);
-const cube = new Cuboid(
-    {x: -200, y: -200, z: -200},
-    {x: 0, y: 0, z: 0}
-)
 
-const shapes = [cube, sphere]
+const shapes = [
+    new Sphere({x: 0, y: 0, z: 0}, 100, 15),
+    new Cuboid({x: -300, y: -100, z: -100}, {x: -100, y: 100, z: 100}),
+    new Cuboid({x: 100, y: -100, z: -100}, {x: 300, y: 100, z: 100}),
+]
 
 function loop() {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
