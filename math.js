@@ -47,3 +47,7 @@ function projectFromPerspective(v, fov) {
         z: v.z * scale
     }
 }
+
+function zIndex(face) {
+    return Math.max(face[0].z, face[1].z, face[2].z);
+}

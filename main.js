@@ -57,6 +57,8 @@ function loop() {
     const clamp = Math.PI / 2 - 0.01
     camera.rx = Math.max(-clamp, Math.min(clamp, camera.rx));
 
+    const globalFaces = [];
+
     for (const shape of shapes) {
         const vertices = shape.vertices;
         const faces = shape.faces;
@@ -83,7 +85,7 @@ function loop() {
             projected.push({
                 x: p.x + centerWidth,
                 y: p.y + centerHeight,
-                z: p.z
+                z: cv.z
             });
         }
 
@@ -94,12 +96,21 @@ function loop() {
 
             if (!v0 || !v1 || !v2) continue;
 
-            drawFace([v0, v1, v2], "gray")
-            drawEdge(v0, v1, "white");
-            drawEdge(v1, v2, "white");
-            drawEdge(v2, v0, "white");
+            globalFaces.push([v0, v1, v2])
         }
     }
+
+    globalFaces.sort((a, b) => zIndex(b) - zIndex(a));
+
+    for (const face of globalFaces) {
+        ctx.fillStyle = "gray";
+        ctx.strokeStyle = "white";
+
+        drawFace([face[0], face[1], face[2]]);
+        drawEdge( face[0], face[1] );
+        drawEdge( face[1], face[2] );
+        drawEdge( face[2], face[0] );
+    } 
 
     requestAnimationFrame(loop)
 }

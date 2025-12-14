@@ -9,7 +9,7 @@ const centerWidth = canvasWidth / 2;
 const centerHeight = canvasHeight / 2
 
 const speed = 2.5;
-const rotationspeed = 0.01;
+const rotationspeed = .01;
 const fov = 500;
 
 const keys = {

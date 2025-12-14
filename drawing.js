@@ -10,21 +10,17 @@ function drawVertex(x, y) {
     ctx.fill();
 }
 
-function drawEdge(u, v, c) {
+function drawEdge(u, v) {
     ctx.beginPath();
     ctx.moveTo(u.x, u.y);
     ctx.lineTo(v.x, v.y);
-    ctx.strokeStyle = c;
     ctx.stroke();
 }
 
-function drawFace(vertices, c) {
-    ctx.fillStyle = c; 
-    ctx.lineWidth = 1;
-
+function drawFace(vertices) {
     ctx.beginPath();
     for (const v of vertices) ctx.lineTo(v.x, v.y);
     ctx.closePath();
-
+    
     ctx.fill();
 }
