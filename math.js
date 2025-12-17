@@ -75,5 +75,5 @@ function isFacing(v0, v1, v2) {
 }
 
 function zIndex(face) {
-    return Math.max(face[0].z, face[1].z, face[2].z);
+    return (face[0].z + face[1].z + face[2].z) / 3;
 }
